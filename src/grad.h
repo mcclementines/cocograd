@@ -1,5 +1,5 @@
-#ifndef COCOGRADG
-#define COCOGRADG
+#ifndef COCOGRAD_GRAD
+#define COCOGRAD_GRAD
 
 #include <stdbool.h>
 

@@ -1,5 +1,5 @@
-#ifndef COCOGRADNET
-#define COCOGRADNET
+#ifndef COCOGRAD_NET
+#define COCOGRAD_NET
 
 
 
