@@ -1,10 +1,10 @@
 CC = clang
 CXX = clang
-INCLUDES = -I../cocograd
+INCLUDES = -I../src
 CFLAGS = -g -Wall $(INCLUDES)
 CXXFLAGS = -g -Wall $(INCLUDES)
 LDFLAGS = -g
-LDLIBS = -L../cocograd -lcocograd
+LDLIBS = -L../src -lcocograd
 
 main: main.o
 

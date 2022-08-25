@@ -1,5 +1,7 @@
-#ifndef COCOGRAD
-#define COCOGRAD
+#ifndef COCOGRADG
+#define COCOGRADG
+
+#include <stdbool.h>
 
 struct Value {
     double data;

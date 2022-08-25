@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "grad.h"
+#include "cocograd.h"
 
 int main()
 {
