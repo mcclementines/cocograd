@@ -17,25 +17,27 @@ struct ValueList {
     int size;
 };
 
-struct Value new_value(double data);
+struct Value *init_value(double data);
 
-struct Value add_values(struct Value *lhs, struct Value *rhs);
+struct Value *add_values(struct Value *lhs, struct Value *rhs);
 
-struct Value add_value_double(struct Value *lhs, double rhs);
+struct Value *add_value_double(struct Value *lhs, double rhs);
 
-struct Value sub_value_double(struct Value *lhs, double rhs);
+struct Value *sub_value_double(struct Value *lhs, double rhs);
 
-struct Value mul_values(struct Value *lhs, struct Value *rhs);
+struct Value *mul_values(struct Value *lhs, struct Value *rhs);
 
-struct Value mul_value_double(struct Value *lhs, double rhs);
+struct Value *mul_value_double(struct Value *lhs, double rhs);
 
-struct Value tanh_value(struct Value *self);
+struct Value *tanh_value(struct Value *self);
 
-struct Value exp_value(struct Value *self);
+struct Value *exp_value(struct Value *self);
 
-struct Value pow_value_double(struct Value *base, double exp);
+struct Value *pow_value_double(struct Value *base, double exp);
 
-struct Value div_values(struct Value *numer, struct Value *denom);
+struct Value *div_values(struct Value *numer, struct Value *denom);
+
+struct ValueList *init_value_list(double values[], int size);
 
 bool is_value_in_list(struct Value *val, struct ValueList *list);
 

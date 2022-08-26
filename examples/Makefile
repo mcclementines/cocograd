@@ -6,21 +6,25 @@ CXXFLAGS = -g -Wall $(INCLUDES)
 LDFLAGS = -g
 LDLIBS = -L../src -lcocograd
 
-main: main.o
+simple_neural_net: simple_neural_net.o
 
-main.o: main.c
+simple_neural_net.o: simple_neural_net.c
+
+value_operations: value_operations.o
+
+value_operations.o: value_operations.c
 
 .PHONY: all
-all: clean main
+all: clean value_operations simple_neural_net
 
-.PHONY: run
-run: main
-	./main
+# .PHONY: run
+# run: value_operations
+# 	./value_operations
 
-.PHONY: valgrind
-valgrind: main
-	valgrind --leak-check=yes ./main
+# .PHONY: valgrind
+# valgrind: value_operations
+# 	valgrind --leak-check=yes ./value_operations
 
 .PHONY: clean
 clean:
-	rm -f *.o *.a main
+	rm -f *.o *.a value_operations simple_neural_net

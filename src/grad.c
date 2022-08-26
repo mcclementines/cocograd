@@ -9,15 +9,15 @@
 * Value Operations
 */
 
-struct Value new_value(double data) {
-    struct Value  val;
+struct Value *init_value(double data) {
+    struct Value *val = malloc(sizeof (struct Value));
 
-    val.data = data;
-    val.grad = 0;
-    val.opt = 0;
-    val.lhs = NULL;
-    val.rhs = NULL;
-    val.backward = NULL;
+    val->data = data;
+    val->grad = 0;
+    val->opt = 0;
+    val->lhs = NULL;
+    val->rhs = NULL;
+    val->backward = NULL; 
 
     return val;
 }
@@ -33,44 +33,36 @@ void add_backward(struct Value *self) {
     self->rhs->grad += 1.0 * self->grad;
 }
 
-struct Value add_values(struct Value *lhs, struct Value *rhs) {
-    struct Value val;
+struct Value *add_values(struct Value *lhs, struct Value *rhs) {
+    struct Value *val = init_value(0);
 
-    val.data = rhs->data + lhs->data;
-    val.grad = 0;
-    val.opt = 0;
-    val.lhs = lhs;
-    val.rhs = rhs;
-    val.backward = &add_backward;
+    val->data = rhs->data + lhs->data;
+    val->grad = 0;
+    val->opt = 0;
+    val->lhs = lhs;
+    val->rhs = rhs;
+    val->backward = &add_backward;
 
     return val;
 }
 
-struct Value add_value_double(struct Value *lhs, double rhs) {
-    struct Value val;
-    struct Value *val_rhs = malloc(sizeof (struct Value));
+struct Value *add_value_double(struct Value *lhs, double rhs) {
+    struct Value *val = init_value(0);
+    struct Value *val_rhs = init_value(rhs);
 
-    struct Value tmp = new_value(rhs);
-    val_rhs->data = tmp.data;
-    val_rhs->grad = tmp.grad;
-    val_rhs->opt = tmp.opt;
-    val_rhs->lhs = tmp.lhs;
-    val_rhs->rhs = tmp.rhs;
-    val_rhs->backward = tmp.backward;
-
-    val.data = val_rhs->data + lhs->data;
-    val.grad = 0;
-    val.opt = 0;
-    val.lhs = lhs;
-    val.rhs = val_rhs;
-    val.backward = &add_backward;
+    val->data = val_rhs->data + lhs->data;
+    val->grad = 0;
+    val->opt = 0;
+    val->lhs = lhs;
+    val->rhs = val_rhs;
+    val->backward = &add_backward;
 
     return val;
 }
 
 // SUBTRACT
 
-struct Value sub_value_double(struct Value *lhs, double rhs) {
+struct Value *sub_value_double(struct Value *lhs, double rhs) {
     return add_value_double(lhs, (-1.0 * rhs));
 }
 
@@ -81,55 +73,46 @@ void mul_backward(struct Value *self) {
     self->rhs->grad += self->lhs->data * self->grad;
 }
 
-struct Value mul_values(struct Value *lhs, struct Value *rhs) {
-    struct Value val;
+struct Value *mul_values(struct Value *lhs, struct Value *rhs) {
+    struct Value *val = init_value(0);
 
-    val.data = lhs->data * rhs->data;
-    val.grad = 0;
-    val.opt = 0;
-    val.lhs = lhs;
-    val.rhs = rhs;
-    val.backward = &mul_backward;
+    val->data = lhs->data * rhs->data;
+    val->grad = 0;
+    val->opt = 0;
+    val->lhs = lhs;
+    val->rhs = rhs;
+    val->backward = &mul_backward;
 
     return val;
 }
 
-struct Value mul_value_double(struct Value *lhs, double rhs) {
-    struct Value val;
-    struct Value *val_rhs = malloc(sizeof (struct Value)); // need to free when done
+struct Value *mul_value_double(struct Value *lhs, double rhs) {
+    struct Value *val = init_value(0);
+    struct Value *val_rhs = init_value(rhs);
 
-    struct Value tmp = new_value(rhs);
-    
-    val_rhs->data = tmp.data;
-    val_rhs->grad = tmp.grad;
-    val_rhs->opt = tmp.opt;
-    val_rhs->lhs = tmp.lhs;
-    val_rhs->rhs = tmp.rhs;
-    val_rhs->backward = tmp.backward;
-    
-    val.data = lhs->data * val_rhs->data;
-    val.grad = 0;
-    val.opt = 0;
-    val.lhs = lhs;
-    val.rhs = val_rhs;
-    val.backward = &mul_backward;
+    val->data = lhs->data * val_rhs->data;
+    val->grad = 0;
+    val->opt = 0;
+    val->lhs = lhs;
+    val->rhs = val_rhs;
+    val->backward = &mul_backward;
 
     return val;
 }
 
 // DIVISION
 
-struct Value div_values(struct Value *numer, struct Value *denom) {
-    struct Value *converted_denom = malloc(sizeof (struct Value)); // need to free when done
+struct Value *div_values(struct Value *numer, struct Value *denom) {
+    struct Value *converted_denom = init_value(0);
 
-    struct Value tmp = pow_value_double(denom, -1);
+    struct Value *tmp = pow_value_double(denom, -1);
 
-    converted_denom->data = tmp.data;
-    converted_denom->grad = tmp.grad;
-    converted_denom->opt = tmp.opt;
-    converted_denom->lhs = tmp.lhs;
-    converted_denom->rhs = tmp.rhs;
-    converted_denom->backward = tmp.backward;
+    converted_denom->data = tmp->data;
+    converted_denom->grad = tmp->grad;
+    converted_denom->opt = tmp->opt;
+    converted_denom->lhs = tmp->lhs;
+    converted_denom->rhs = tmp->rhs;
+    converted_denom->backward = tmp->backward;
 
     return mul_values(numer, converted_denom);
 }
@@ -140,18 +123,18 @@ void exp_backward(struct Value *self) {
     self->lhs->grad += self->data * self->grad;
 }
 
-struct Value exp_value(struct Value *self) {
-    struct Value val;
+struct Value *exp_value(struct Value *self) {
+    struct Value *val = init_value(0);
 
     double x = self->data;
     double ex = exp(x);
 
-    val.data = ex;
-    val.grad = 0;
-    val.opt = 0;
-    val.lhs = self;
-    val.rhs = NULL;
-    val.backward = &exp_backward;
+    val->data = ex;
+    val->grad = 0;
+    val->opt = 0;
+    val->lhs = self;
+    val->rhs = NULL;
+    val->backward = &exp_backward;
     
     return val;
 }
@@ -161,15 +144,15 @@ void pow_value_double_backward(struct Value *self) {
     self->lhs->grad += exp * pow(self->lhs->data, exp-1) * self->grad;
 }
 
-struct Value pow_value_double(struct Value *base, double exp) {
-    struct Value val;
+struct Value *pow_value_double(struct Value *base, double exp) {
+    struct Value *val = init_value(0);
 
-    val.data = pow(base->data, exp);
-    val.grad = 0;
-    val.opt = exp;
-    val.lhs = base;
-    val.rhs = NULL;
-    val.backward = &pow_value_double_backward;
+    val->data = pow(base->data, exp);
+    val->grad = 0;
+    val->opt = exp;
+    val->lhs = base;
+    val->rhs = NULL;
+    val->backward = &pow_value_double_backward;
 
     return val;
 }
@@ -180,18 +163,18 @@ void tanh_backward(struct Value *self) {
     self->lhs->grad += (1.0-(pow(self->data, 2.0))) * self->grad;
 }
 
-struct Value tanh_value(struct Value *self) {
-    struct Value val;
+struct Value *tanh_value(struct Value *self) {
+    struct Value *val = init_value(0);
 
     double x = self->data;
     double t = (exp(2.0*x) - 1.0) / (exp(2.0*x) + 1.0);
 
-    val.data = t;
-    val.grad = 0;
-    val.opt = 0;
-    val.lhs = self;
-    val.rhs = NULL;
-    val.backward = &tanh_backward;
+    val->data = t;
+    val->grad = 0;
+    val->opt = 0;
+    val->lhs = self;
+    val->rhs = NULL;
+    val->backward = &tanh_backward;
 
     return val;
 }
@@ -199,6 +182,16 @@ struct Value tanh_value(struct Value *self) {
 /*
 * ValueList Operations
 */
+
+struct ValueList *init_value_list(double values[], int size) {
+    struct ValueList *list = malloc(sizeof (struct ValueList));
+
+    for (int i = 0; i < size; i++) {
+        add_value_to_list(init_value(values[i]), list);
+    }
+
+    return list;
+}
 
 bool is_value_in_list(struct Value *val, struct ValueList *list) {
     for (int i = 0; i < list->size; i++) {
