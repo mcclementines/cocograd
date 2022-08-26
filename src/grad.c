@@ -103,18 +103,7 @@ struct Value *mul_value_double(struct Value *lhs, double rhs) {
 // DIVISION
 
 struct Value *div_values(struct Value *numer, struct Value *denom) {
-    struct Value *converted_denom = init_value(0);
-
-    struct Value *tmp = pow_value_double(denom, -1);
-
-    converted_denom->data = tmp->data;
-    converted_denom->grad = tmp->grad;
-    converted_denom->opt = tmp->opt;
-    converted_denom->lhs = tmp->lhs;
-    converted_denom->rhs = tmp->rhs;
-    converted_denom->backward = tmp->backward;
-
-    return mul_values(numer, converted_denom);
+    return mul_values(numer, pow_value_double(denom, -1));
 }
 
 // EXPONENTIAL
@@ -185,6 +174,13 @@ struct Value *tanh_value(struct Value *self) {
 
 struct ValueList *init_value_list(double values[], int size) {
     struct ValueList *list = malloc(sizeof (struct ValueList));
+    
+    if (size == 0) {
+        list->list = malloc(sizeof (struct Value *));
+        list->size = 0;
+
+        return list;
+    }
 
     for (int i = 0; i < size; i++) {
         add_value_to_list(init_value(values[i]), list);
@@ -233,16 +229,12 @@ void rbuild_topo(struct Value *val, struct ValueList *topo, struct ValueList *vi
     }
 }
 
-struct ValueList build_topo(struct Value *val) { 
-    struct ValueList topo;
-    topo.list = malloc(sizeof (struct Value *));
-    topo.size = 0;
+struct ValueList *build_topo(struct Value *val) { 
+    struct ValueList *topo = init_value_list(NULL, 0);
 
-    struct ValueList visited;
-    visited.list = malloc(sizeof (struct Value *));
-    visited.size = 0;
+    struct ValueList *visited = init_value_list(NULL, 0);
 
-    rbuild_topo(val, &topo, &visited);
+    rbuild_topo(val, topo, visited);
     
     return topo;
 }
@@ -262,11 +254,12 @@ void backward(struct ValueList *topo) {
 void backwards(struct Value *val) {
     val->grad = 1.0;
     
-    struct ValueList topo = build_topo(val);
+    struct ValueList *topo = build_topo(val);
 
-    backward(&topo);
+    backward(topo);
 
-    free(topo.list);
+    free(topo->list);
+    free(topo);
 }
 
 /*
@@ -279,8 +272,14 @@ void print_value(struct Value *val) {
     }
 }
 
-void rprint_value_tree(struct Value *val, int n) {
-    if (val == NULL) return;
+void print_value_raw(struct Value *val) {
+    if (val != NULL) {
+        printf("Value(data=%f, grad=%f)", val->data, val->grad);
+    }
+}
+
+void rprint_value_tree(struct Value *val, int n, struct ValueList *visited) {
+    if (val == NULL || is_value_in_list(val, visited)) return;
     
     for (int x = 0; x < n; x++) {
         printf("-");
@@ -290,12 +289,27 @@ void rprint_value_tree(struct Value *val, int n) {
         printf("%d> ", n);
 
     print_value(val);
+    add_value_to_list(val, visited);
     
-    rprint_value_tree(val->lhs, n+1);
-    rprint_value_tree(val->rhs, n+1);
+    rprint_value_tree(val->lhs, n+1, visited);
+    rprint_value_tree(val->rhs, n+1, visited);
 }
 
-// TODO: add visited list to omit excess printing
 void print_value_tree(struct Value *val) {
-    rprint_value_tree(val, 0);
+    struct ValueList *visited = init_value_list(NULL, 0);
+
+    rprint_value_tree(val, 0, visited);
+}
+
+void print_value_list(struct ValueList *list) {
+    printf("[");
+    
+    for (int i = 0; i < list->size; i++) {
+        print_value_raw(list->list[i]);
+
+        if (i < list->size-1)
+            printf(",\n");
+    }
+    
+    printf("]\n");
 }

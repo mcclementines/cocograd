@@ -43,12 +43,14 @@ bool is_value_in_list(struct Value *val, struct ValueList *list);
 
 void add_value_to_list(struct Value *val, struct ValueList *list);
 
-struct ValueList build_topo(struct Value *val);
+struct ValueList *build_topo(struct Value *val);
 
 void backwards(struct Value *val);
 
 void print_value(struct Value *val);
 
 void print_value_tree(struct Value *val);
+
+void print_value_list(struct ValueList *list);
 
 #endif
