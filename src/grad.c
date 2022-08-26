@@ -189,6 +189,22 @@ struct ValueList *init_value_list(double values[], int size) {
     return list;
 }
 
+struct ValueList **value_list_arr(double inputs[], int y, int x) {
+    struct ValueList **arr = malloc(y * sizeof(struct ValueList *));
+
+    for (int cy = 0; cy < y; cy++) {
+        struct ValueList *list = init_value_list(NULL, 0);
+        
+        for (int cx = 0; cx < x; cx++) {
+            add_value_to_list(init_value(inputs[(cy*x)+cx]), list);
+        }
+
+        arr[cy] = list;
+    }
+
+    return arr;
+}
+
 bool is_value_in_list(struct Value *val, struct ValueList *list) {
     for (int i = 0; i < list->size; i++) {
         if (val == (list->list)[i])
@@ -302,6 +318,11 @@ void print_value_tree(struct Value *val) {
 }
 
 void print_value_list(struct ValueList *list) {
+    if (list->size < 2) {
+        print_value(list->list[0]);
+        return;
+    }
+
     printf("[");
     
     for (int i = 0; i < list->size; i++) {

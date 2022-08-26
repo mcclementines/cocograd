@@ -13,6 +13,11 @@ struct Layer {
     int size;
 };
 
+struct MLP {
+    struct Layer **layers;
+    int size;
+};
+
 void init_net();
 
 struct Neuron *init_neuron();
@@ -26,5 +31,9 @@ struct ValueList *eval_layer(struct Layer *layer, struct ValueList *xs);
 bool is_neuron_in_layer(struct Neuron *neuron, struct Layer *list);
 
 void add_neuron_to_layer(struct Neuron *neuron, struct Layer *list);
+
+struct MLP *init_mlp(int nin, int outs[], int nouts);
+
+struct ValueList *eval_mlp(struct MLP *mlp, struct ValueList *xs);
 
 #endif

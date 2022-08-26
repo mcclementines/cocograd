@@ -71,7 +71,7 @@ struct ValueList *eval_layer(struct Layer *layer, struct ValueList *xs) {
     return vals;
 }
 
-bool is_neuron_in_list(struct Neuron *neuron, struct Layer *list) {
+bool is_neuron_in_layer(struct Neuron *neuron, struct Layer *list) {
         for (int i = 0; i < list->size; i++) {
         if (neuron == (list->neurons)[i])
             return true;
@@ -80,7 +80,7 @@ bool is_neuron_in_list(struct Neuron *neuron, struct Layer *list) {
     return false;
 }
 
-void add_neuron_to_list(struct Neuron *neuron, struct Layer *list) {
+void add_neuron_to_layer(struct Neuron *neuron, struct Layer *list) {
     struct Neuron **new_list = malloc(1 + list->size * sizeof(struct Neuron *));
 
     for (int i = 0; i < list->size; i++)
@@ -92,4 +92,32 @@ void add_neuron_to_list(struct Neuron *neuron, struct Layer *list) {
     
     list->neurons = new_list;
     list->size += 1;
+}
+
+struct MLP *init_mlp(int nin, int outs[], int nouts) {
+    struct MLP *mlp = malloc(sizeof (struct MLP));
+
+    mlp->layers = malloc((nouts+1) * sizeof(struct Value *));
+    mlp->size = nouts;
+
+    for (int i = 0; i < nouts; i++) {
+        if (i == 0) {
+            mlp->layers[i] = init_layer(nin, outs[i+1]);
+            continue;
+        }
+
+        mlp->layers[i] = init_layer(outs[i-1], outs[i]);
+    }
+
+    return mlp;
+}
+
+struct ValueList *eval_mlp(struct MLP *mlp, struct ValueList *xs) {
+    struct ValueList *list = xs;
+
+    for (int i = 0; i < mlp->size; i++)  {
+        list = eval_layer(mlp->layers[i], list);
+    }
+
+    return list;
 }

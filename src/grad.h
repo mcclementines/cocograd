@@ -39,6 +39,8 @@ struct Value *div_values(struct Value *numer, struct Value *denom);
 
 struct ValueList *init_value_list(double values[], int size);
 
+struct ValueList **value_list_arr(double inputs[], int y, int x);
+
 bool is_value_in_list(struct Value *val, struct ValueList *list);
 
 void add_value_to_list(struct Value *val, struct ValueList *list);
