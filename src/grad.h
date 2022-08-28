@@ -23,6 +23,8 @@ struct Value *add_values(struct Value *lhs, struct Value *rhs);
 
 struct Value *add_value_double(struct Value *lhs, double rhs);
 
+struct Value *sub_values(struct Value *lhs, struct Value *rhs);
+
 struct Value *sub_value_double(struct Value *lhs, double rhs);
 
 struct Value *mul_values(struct Value *lhs, struct Value *rhs);
@@ -44,6 +46,8 @@ struct ValueList **value_list_arr(double inputs[], int y, int x);
 bool is_value_in_list(struct Value *val, struct ValueList *list);
 
 void add_value_to_list(struct Value *val, struct ValueList *list);
+
+void add_value_lists(struct ValueList *base, struct ValueList *append);
 
 struct ValueList *build_topo(struct Value *val);
 

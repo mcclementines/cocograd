@@ -62,6 +62,16 @@ struct Value *add_value_double(struct Value *lhs, double rhs) {
 
 // SUBTRACT
 
+struct Value *sub_values(struct Value *lhs, struct Value *rhs) {
+    rhs->data *= -1.0;
+
+    struct Value *val = add_values(lhs, rhs);
+
+    rhs->data *= -1.0;
+
+    return val;
+}
+
 struct Value *sub_value_double(struct Value *lhs, double rhs) {
     return add_value_double(lhs, (-1.0 * rhs));
 }
@@ -174,11 +184,10 @@ struct Value *tanh_value(struct Value *self) {
 
 struct ValueList *init_value_list(double values[], int size) {
     struct ValueList *list = malloc(sizeof (struct ValueList));
+    list->list = malloc(sizeof (struct Value *));
+    list->size = 0;
     
     if (size == 0) {
-        list->list = malloc(sizeof (struct Value *));
-        list->size = 0;
-
         return list;
     }
 
@@ -191,7 +200,7 @@ struct ValueList *init_value_list(double values[], int size) {
 
 struct ValueList **value_list_arr(double inputs[], int y, int x) {
     struct ValueList **arr = malloc(y * sizeof(struct ValueList *));
-
+    
     for (int cy = 0; cy < y; cy++) {
         struct ValueList *list = init_value_list(NULL, 0);
         
@@ -226,6 +235,12 @@ void add_value_to_list(struct Value *val, struct ValueList *list) {
     
     list->list = new_list;
     list->size += 1;
+}
+
+void add_value_lists(struct ValueList *base, struct ValueList *append) {
+    for (int i = 0; i < append->size; i++) {
+        add_value_to_list(append->list[i], base);
+    }
 }
 
 /*

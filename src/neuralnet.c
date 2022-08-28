@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <time.h>
 
 #include "cocograd.h"
@@ -32,6 +33,15 @@ struct Neuron *init_neuron(int nin) {
     return neuron;
 }
 
+struct ValueList *neuron_params(struct Neuron *neuron) {
+    struct ValueList *vals = init_value_list(0, 0);
+
+    add_value_lists(vals, neuron->weights);
+    add_value_to_list(neuron->bias, vals);
+
+    return vals;
+}
+
 struct Value *eval_neuron(struct Neuron *neuron, struct ValueList *xs) {
     if (neuron->weights->size != xs->size) return NULL;
 
@@ -59,6 +69,20 @@ struct Layer *init_layer(int nin, int nout) {
     }
 
     return list;
+}
+
+struct ValueList *layer_params(struct Layer *layer) {
+    struct ValueList *layer_params = init_value_list(0, 0);
+
+    for (int i = 0; i < layer->size; i++) {
+        struct ValueList *params = neuron_params(layer->neurons[i]);
+
+        add_value_lists(layer_params, params);
+
+        free(params);
+    }
+
+    return layer_params;
 }
 
 struct ValueList *eval_layer(struct Layer *layer, struct ValueList *xs) {
@@ -112,6 +136,20 @@ struct MLP *init_mlp(int nin, int outs[], int nouts) {
     return mlp;
 }
 
+struct ValueList *mlp_params(struct MLP *mlp) {
+    struct ValueList *mlp_params = init_value_list(0, 0);
+
+    for (int i = 0; i < mlp->size; i++) {
+        struct ValueList *params = layer_params(mlp->layers[i]);
+
+        add_value_lists(mlp_params, params);
+
+        free(params);
+    }
+
+    return mlp_params;
+}
+
 struct ValueList *eval_mlp(struct MLP *mlp, struct ValueList *xs) {
     struct ValueList *list = xs;
 
@@ -120,4 +158,36 @@ struct ValueList *eval_mlp(struct MLP *mlp, struct ValueList *xs) {
     }
 
     return list;
+}
+
+struct Value *mean_squared_loss(struct Value *pred, struct Value *truth) {
+    return pow_value_double(sub_values(pred, truth), 2.0);
+}
+
+void train_network() {}
+
+void train_network_with_iteration(struct MLP *mlp, struct ValueList **inputs, struct ValueList *truths, int nin, double step, int iterations) {
+    for (int iters = 0; iters < iterations; iters++) {
+        struct ValueList *ypred = init_value_list(0, 0);
+        
+        for (int i = 0; i < nin; i++) {
+            add_value_lists(ypred, eval_mlp(mlp, inputs[i]));
+        }
+
+        struct Value *loss = init_value(0);
+        for (int i = 0; i < nin; i++) {
+            loss = add_values(loss, mean_squared_loss(ypred->list[i], truths->list[i]));
+        }
+
+        printf("Iteration %d loss: %f\n", iters, loss->data);
+
+        backwards(loss);
+
+        struct ValueList *params = mlp_params(mlp);
+
+        for (int i = 0; i < params->size; i++) {
+            params->list[i]->data += -1.0 * step * params->list[i]->grad;
+            params->list[i]->grad = 0.0;
+        }
+    }
 }
