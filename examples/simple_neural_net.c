@@ -15,15 +15,10 @@ int main() {
     
     double ys[4] = {1.0, -1.0, -1.0, 1.0};
 
-    struct ValueList **inputs = value_list_arr(xs, 4, 3);
+    struct ValueList **inputs = init_value_list_2d(xs, 4, 3);
     struct ValueList *truths = init_value_list(ys, 4);
 
-    train_network_with_iteration(mlp, inputs, truths, 4, .02, 200000);
+    train_network_with_iteration(mlp, inputs, truths, 4, .05, 200);
 
-    struct ValueList *outs = init_value_list(0,0);
-    for (int i = 0; i < 4; i++) {
-        add_value_lists(outs, eval_mlp(mlp, inputs[i]));
-    }
-
-    print_value_list(outs);
+    print_value_list(eval_mlp_for_inputs(mlp, inputs, 4));
 }

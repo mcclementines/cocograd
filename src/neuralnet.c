@@ -160,19 +160,23 @@ struct ValueList *eval_mlp(struct MLP *mlp, struct ValueList *xs) {
     return list;
 }
 
+struct ValueList *eval_mlp_for_inputs(struct MLP *mlp, struct ValueList **inputs, int nin) {
+    struct ValueList *outs = init_value_list(0,0);
+    
+    for (int i = 0; i < 4; i++) {
+        add_value_lists(outs, eval_mlp(mlp, inputs[i]));
+    }
+
+    return outs;
+}
+
 struct Value *mean_squared_loss(struct Value *pred, struct Value *truth) {
     return pow_value_double(sub_values(pred, truth), 2.0);
 }
 
-void train_network() {}
-
 void train_network_with_iteration(struct MLP *mlp, struct ValueList **inputs, struct ValueList *truths, int nin, double step, int iterations) {
     for (int iters = 0; iters < iterations; iters++) {
-        struct ValueList *ypred = init_value_list(0, 0);
-        
-        for (int i = 0; i < nin; i++) {
-            add_value_lists(ypred, eval_mlp(mlp, inputs[i]));
-        }
+        struct ValueList *ypred = eval_mlp_for_inputs(mlp, inputs, nin);
 
         struct Value *loss = init_value(0);
         for (int i = 0; i < nin; i++) {
@@ -189,5 +193,9 @@ void train_network_with_iteration(struct MLP *mlp, struct ValueList **inputs, st
             params->list[i]->data += -1.0 * step * params->list[i]->grad;
             params->list[i]->grad = 0.0;
         }
+
+        free(ypred);
+        free(loss);
+        free(params);
     }
 }

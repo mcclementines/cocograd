@@ -198,7 +198,7 @@ struct ValueList *init_value_list(double values[], int size) {
     return list;
 }
 
-struct ValueList **value_list_arr(double inputs[], int y, int x) {
+struct ValueList **init_value_list_2d(double inputs[], int y, int x) {
     struct ValueList **arr = malloc(y * sizeof(struct ValueList *));
     
     for (int cy = 0; cy < y; cy++) {

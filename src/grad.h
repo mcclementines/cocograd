@@ -41,7 +41,7 @@ struct Value *div_values(struct Value *numer, struct Value *denom);
 
 struct ValueList *init_value_list(double values[], int size);
 
-struct ValueList **value_list_arr(double inputs[], int y, int x);
+struct ValueList **init_value_list_2d(double inputs[], int y, int x);
 
 bool is_value_in_list(struct Value *val, struct ValueList *list);
 

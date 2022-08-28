@@ -42,6 +42,8 @@ struct ValueList *mlp_params(struct MLP *mlp);
 
 struct ValueList *eval_mlp(struct MLP *mlp, struct ValueList *xs);
 
+struct ValueList *eval_mlp_for_inputs(struct MLP *mlp, struct ValueList **inputs, int nin);
+
 struct Value *mean_squared_loss(struct Value *pred, struct Value *truth);
 
 void train_network_with_iteration(struct MLP *mlp, struct ValueList **inputs, struct ValueList *truths, int nin, double step, int iterations);
